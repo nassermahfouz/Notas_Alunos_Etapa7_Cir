@@ -4,7 +4,7 @@ import sqlite3, os, csv, json
 from datetime import datetime
 
 app = Flask(__name__)
-app.secret_key = "etapa7_secret"
+app.secret_key = "etapa7_seguro"
 
 DB_FILE = "notas.db"
 USUARIOS_FILE = "usuarios.json"
@@ -106,7 +106,8 @@ def relatorio():
     if "usuario" not in session:
         return redirect("/login")
     usuarios = carregar_usuarios()
-    if not usuarios[session["usuario"]]["acesso_relatorio"]:
+    usuario = session["usuario"]
+    if not usuarios[usuario]["acesso_relatorio"]:
         return redirect("/")
     registros = []
     if request.method == "POST":
@@ -135,6 +136,38 @@ def relatorio():
     return render_template("relatorio.html", titulo="GERENCIADOR DE NOTAS ETAPA 7 CLÍNICA CIRÚRGICA",
                            alunos=alunos, professores=professores, registros=registros)
 
+@app.route("/editar-nota/<int:nota_id>", methods=["GET", "POST"])
+def editar_nota(nota_id):
+    if "usuario" not in session:
+        return redirect("/login")
+    usuario = session["usuario"]
+    usuarios = carregar_usuarios()
+    if not usuarios[usuario]["acesso_relatorio"]:
+        return redirect("/")
+    erro = sucesso = None
+    with sqlite3.connect(DB_FILE) as conn:
+        cursor = conn.cursor()
+        nota_info = cursor.execute("SELECT aluno, professor, nota FROM notas WHERE id=?", (nota_id,)).fetchone()
+        if not nota_info:
+            return "Nota não encontrada."
+        aluno, professor, nota_atual = nota_info
+        if request.method == "POST":
+            try:
+                nova = float(request.form["nova_nota"])
+                if 0 <= nova <= 10:
+                    cursor.execute("UPDATE notas SET nota=? WHERE id=?", (nova, nota_id))
+                    conn.commit()
+                    sucesso = "Nota atualizada com sucesso!"
+                else:
+                    erro = "A nota deve estar entre 0 e 10."
+            except:
+                erro = "Nota inválida."
+    return render_template("editar_nota.html", aluno=aluno, professor=professor,
+                           nota_atual=nota_atual, erro=erro, sucesso=sucesso)
+
 @app.route("/exportar")
 def exportar():
     return send_file("export_notas.csv", as_attachment=True)
+
+if __name__ == "__main__":
+    app.run(debug=True)
