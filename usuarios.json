@@ -1,0 +1,26 @@
+{
+  "LUIGI RODRIGUES BRIANEZ": {
+    "senha": "luigi123",
+    "acesso_relatorio": true
+  },
+  "ELOISA ALMEIDA CURVO": {
+    "senha": "eloisa123",
+    "acesso_relatorio": false
+  },
+  "JOSE ROBERTO R. DE LIMA": {
+    "senha": "jose123",
+    "acesso_relatorio": false
+  },
+  "MARCOS HENRIQUE DE CARVALHO": {
+    "senha": "marcos123",
+    "acesso_relatorio": false
+  },
+  "NASSER MAHFOUZ": {
+    "senha": "nasser123",
+    "acesso_relatorio": true
+  },
+  "RODRIGO CAETANO": {
+    "senha": "rodrigo123",
+    "acesso_relatorio": false
+  }
+}
